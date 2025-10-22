@@ -1,0 +1,43 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Debug Dev Server",
+			"type": "node",
+			"request": "launch",
+			"program": "${workspaceFolder}/src/index.ts",
+			"cwd": "${workspaceFolder}",
+			"runtimeArgs": ["--inspect", "--watch"],
+			"env": {
+				"NODE_ENV": "development"
+			},
+			"console": "integratedTerminal",
+			"restart": true,
+			"protocol": "inspector"
+		},
+		{
+			"name": "Debug Tests",
+			"type": "node",
+			"request": "launch",
+			"program": "${workspaceFolder}/node_modules/.bin/bun",
+			"args": ["test", "--watch"],
+			"cwd": "${workspaceFolder}",
+			"console": "integratedTerminal",
+			"env": {
+				"NODE_ENV": "test"
+			}
+		},
+		{
+			"name": "Run Current Test File",
+			"type": "node",
+			"request": "launch",
+			"program": "${workspaceFolder}/node_modules/.bin/bun",
+			"args": ["test", "${file}"],
+			"cwd": "${workspaceFolder}",
+			"console": "integratedTerminal",
+			"env": {
+				"NODE_ENV": "test"
+			}
+		}
+	]
+}

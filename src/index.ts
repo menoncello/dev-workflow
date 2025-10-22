@@ -6,6 +6,10 @@ import env from "#helpers/env";
 import authRoutes from "#modules/auth/routes";
 import meRoutes from "#modules/me/routes";
 import userRoutes from "#modules/user/routes";
+import agentsRouter from "#routes/api/v1/agents";
+import systemRouter from "#routes/api/v1/system";
+import toolsRouter from "#routes/api/v1/tools";
+import workflowsRouter from "#routes/api/v1/workflows";
 
 console.time("⌛ Startup Time");
 
@@ -18,6 +22,10 @@ new Elysia()
 			.use(userRoutes)
 			.use(authRoutes)
 			.use(meRoutes)
+			.use(agentsRouter)
+			.use(workflowsRouter)
+			.use(toolsRouter)
+			.use(systemRouter)
 			.onError(({ error, ...ctx }) => {
 				console.log({ ctx });
 			}),
