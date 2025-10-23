@@ -3,142 +3,100 @@
 ## Test Structure
 
 ```typescript
-import { describe, it, expect, beforeEach, afterEach } from 'bun:test'
+import { describe, expect, test } from "bun:test";
 
-describe('Component/Function Name', () => {
-  beforeEach(() => {
-    // Setup code before each test
-  })
+describe("Feature name", () => {
+  test("should do something", () => {
+    // Test implementation
+    expect(result).toBe(expected);
+  });
 
-  afterEach(() => {
-    // Cleanup code after each test
-  })
-
-  it('should do X when given Y', async () => {
-    // Given
-    const input = createTestInput()
-
-    // When
-    const result = await functionUnderTest(input)
-
-    // Then
-    expect(result).toBe(expectedOutput)
-  })
-
-  it('should handle error case Z', () => {
-    // Given
-    const invalidInput = createInvalidInput()
-
-    // When/Then
-    expect(() => functionUnderTest(invalidInput)).toThrow('Expected error message')
-  })
-})
+  test("should handle edge case", async () => {
+    // Async test example
+    const result = await someAsyncFunction();
+    expect(result).toBeDefined();
+  });
+});
 ```
 
-## Quality Requirements
+## Best Practices
 
-- **100% test pass rate required** - No failing tests allowed
-- **Proper TypeScript types** - No 'any' types, infer types correctly
-- **Async/await handling** - No floating promises, proper error handling
-- **Biome compliance** - Follow all linting rules (no-unused-vars, etc.)
-- **Test coverage** - Cover all acceptance criteria and edge cases
+### Test Organization
+- Use `describe` for test suites that group related tests
+- Use `test` (or `it`) for individual test cases
+- Use descriptive test names that explain what should happen
+- Group tests by feature or functionality
 
-## Test Data Patterns
+### Assertions
+- Use `expect` for assertions
+- Prefer specific matchers over generic ones
+- Test both positive and negative cases
+- Include boundary value testing
 
+### TypeScript Types
+- Use proper TypeScript types (no `any`)
+- Infer types correctly from test data
+- Type test fixtures and mocks properly
+
+### Async Testing
+- Handle async/await correctly
+- No floating promises - always await or handle promise rejection
+- Use proper error handling for async operations
+
+### Biome Compliance
+- Follow Biome formatting rules
+- No unused variables (prefix with underscore if intentionally unused)
+- Use node: protocol for Node.js imports
+- Proper import organization
+
+### Test Data
+- Use factories or builders for complex test objects
+- Keep test data minimal and focused
+- Use meaningful test data that covers realistic scenarios
+
+## Example Patterns
+
+### Service Testing
 ```typescript
-// Use factories for test data
-const createUser = (overrides?: Partial<User>): User => ({
-  id: 'test-id',
-  name: 'Test User',
-  email: 'test@example.com',
-  ...overrides
-})
+describe("UserService", () => {
+  test("should create user with valid data", async () => {
+    const userData = {
+      name: "John Doe",
+      email: "john@example.com"
+    };
 
-// Use descriptive test names
-it('should create agent when valid configuration provided', async () => {
-  const agentConfig = createAgentConfig({
-    name: 'Test Agent',
-    type: 'developer'
-  })
+    const user = await userService.create(userData);
 
-  const result = await createAgent(agentConfig)
-
-  expect(result.id).toBeDefined()
-  expect(result.name).toBe('Test Agent')
-  expect(result.type).toBe('developer')
-})
+    expect(user.id).toBeDefined();
+    expect(user.name).toBe(userData.name);
+    expect(user.email).toBe(userData.email);
+  });
+});
 ```
 
-## Mocking with Bun
-
+### API Endpoint Testing
 ```typescript
-import { mock, spyOn } from 'bun:test'
+describe("POST /api/users", () => {
+  test("should return 201 for valid user creation", async () => {
+    const response = await app
+      .handle(new Request("http://localhost/api/users", {
+        method: "POST",
+        body: JSON.stringify({ name: "John", email: "john@example.com" })
+      }));
 
-// Mock external dependencies
-const mockDatabase = mock(() => ({
-  save: async () => ({ id: 'mock-id' }),
-  find: async () => ({ name: 'Mock Data' })
-}))
-
-// Spy on existing functions
-const spy = spyOn(console, 'log')
-
-// Use mocks in tests
-it('should save to database', async () => {
-  const service = new Service(mockDatabase)
-
-  await service.processData('test-data')
-
-  expect(mockDatabase.save).toHaveBeenCalledWith('test-data')
-})
+    expect(response.status).toBe(201);
+    const data = await response.json();
+    expect(data.id).toBeDefined();
+  });
+});
 ```
 
-## Error Testing
+## Integration with BMAD
 
-```typescript
-it('should throw ValidationError when input is invalid', async () => {
-  const invalidInput = { name: '' } // Missing required fields
+This project enforces zero-tolerance quality gates:
+- All tests must pass with 100% success rate
+- TypeScript must compile with 0 errors
+- Biome must pass with 0 errors
+- No biome-disable or @ts-ignore comments allowed
 
-  const result = await createAgent(invalidInput)
-
-  // Check that error is thrown
-  expect(result).toThrow(ValidationError)
-
-  // Check error message
-  expect(result).toThrow('Name is required')
-})
-```
-
-## Integration Tests
-
-```typescript
-// Integration tests test component interactions
-describe('Agent Service Integration', () => {
-  let testDatabase: Database
-  let service: AgentService
-
-  beforeEach(async () => {
-    testDatabase = createTestDatabase()
-    service = new AgentService(testDatabase)
-    await testDatabase.migrate()
-  })
-
-  it('should create and retrieve agent through service layer', async () => {
-    const agentData = createAgentConfig()
-    const created = await service.createAgent(agentData)
-    const retrieved = await service.getAgent(created.id)
-
-    expect(retrieved).toEqual(created)
-  })
-})
-```
-
-## Quality Gates
-
-All generated tests must:
-1. Pass TypeScript compilation with 0 errors
-2. Pass Biome linting with 0 errors
-3. Use proper typing (no 'any')
-4. Handle async correctly
-5. Follow naming conventions
-6. Cover all acceptance criteria
+Tests are automatically validated during story implementation and review workflows.

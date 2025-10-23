@@ -1,0 +1,199 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: ${COMPOSE_PROJECT_NAME:-devplugin}-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-devuser}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-devpass}
+      POSTGRES_DB: ${POSTGRES_DB:-devplugin}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./prisma/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-devuser} -d ${POSTGRES_DB:-devplugin}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    profiles:
+      - local
+      - development
+      - staging
+      - production
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: ${COMPOSE_PROJECT_NAME:-devplugin}-redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    profiles:
+      - local
+      - development
+      - staging
+      - production
+
+  # Adminer (Database Management) - Development only
+  adminer:
+    image: adminer:latest
+    container_name: ${COMPOSE_PROJECT_NAME:-devplugin}-adminer
+    restart: unless-stopped
+    ports:
+      - "${ADMINER_PORT:-8080}:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+    depends_on:
+      - postgres
+    profiles:
+      - local
+      - development
+
+  # Redis Commander (Redis Management) - Development only
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: ${COMPOSE_PROJECT_NAME:-devplugin}-redis-commander
+    restart: unless-stopped
+    ports:
+      - "${REDIS_COMMANDER_PORT:-8081}:8081"
+    environment:
+      REDIS_HOSTS: local:redis:6379
+    depends_on:
+      - redis
+    profiles:
+      - local
+      - development
+
+  # Main Application - Development
+  app-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+      args:
+        BUILD_VERSION: ${APP_VERSION:-latest}
+        BUILD_ENV: development
+    container_name: ${COMPOSE_PROJECT_NAME:-devplugin}-app-dev
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    environment:
+      NODE_ENV: development
+      SERVER_PORT: 3000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-devuser}:${POSTGRES_PASSWORD:-devpass}@postgres:5432/${POSTGRES_DB:-devplugin}
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-key-change-in-production}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000,http://localhost:5173}
+      MONITORING_ENABLED: "true"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/build
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "bun", "--print", "fetch('http://localhost:3000/api/health').then(r=>r.json()).then(j=>process.exit(j.status==='ok'?0:1))"]
+      interval: 30s
+      timeout: 10s
+      start_period: 40s
+      retries: 3
+    command: ["bun", "run", "dev"]
+    profiles:
+      - development
+
+  # Main Application - Staging
+  app-staging:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: staging
+      args:
+        BUILD_VERSION: ${APP_VERSION:-latest}
+        BUILD_ENV: staging
+    container_name: ${COMPOSE_PROJECT_NAME:-devplugin}-app-staging
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    environment:
+      NODE_ENV: staging
+      SERVER_PORT: 3000
+      DATABASE_URL: ${STAGING_DATABASE_URL}
+      REDIS_URL: ${STAGING_REDIS_URL}
+      JWT_SECRET: ${STAGING_JWT_SECRET}
+      CORS_ORIGINS: ${STAGING_CORS_ORIGINS}
+      MONITORING_ENABLED: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "bun", "--print", "fetch('http://localhost:3000/api/v1/health/detailed').then(r=>r.json()).then(j=>process.exit(j.healthy?0:1))"]
+      interval: 30s
+      timeout: 10s
+      start_period: 40s
+      retries: 3
+    command: ["bun", "run", "start:staging"]
+    profiles:
+      - staging
+
+  # Main Application - Production
+  app-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+      args:
+        BUILD_VERSION: ${APP_VERSION:-latest}
+        BUILD_ENV: production
+    container_name: ${COMPOSE_PROJECT_NAME:-devplugin}-app-prod
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    environment:
+      NODE_ENV: production
+      SERVER_PORT: 3000
+      DATABASE_URL: ${PRODUCTION_DATABASE_URL}
+      REDIS_URL: ${PRODUCTION_REDIS_URL}
+      JWT_SECRET: ${PRODUCTION_JWT_SECRET}
+      CORS_ORIGINS: ${PRODUCTION_CORS_ORIGINS}
+      MONITORING_ENABLED: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "bun", "--print", "fetch('http://localhost:3000/api/v1/health/detailed').then(r=>r.json()).then(j=>process.exit(j.healthy?0:1))"]
+      interval: 30s
+      timeout: 10s
+      start_period: 40s
+      retries: 3
+    command: ["bun", "run", "start"]
+    profiles:
+      - production
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  default:
+    name: ${COMPOSE_PROJECT_NAME:-devplugin}-network

@@ -60,6 +60,41 @@ services:
     depends_on:
       - redis
 
+  # Main Application (Development)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: devplugin-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      SERVER_PORT: 3000
+      DATABASE_URL: postgresql://devuser:devpass@postgres:5432/devplugin
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: dev-secret-key-change-in-production
+      CORS_ORIGINS: http://localhost:3000,http://localhost:5173
+      MONITORING_ENABLED: "true"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/build
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "bun", "--print", "fetch('http://localhost:3000/api/health').then(r=>r.json()).then(j=>process.exit(j.status==='ok'?0:1))"]
+      interval: 30s
+      timeout: 10s
+      start_period: 40s
+      retries: 3
+    command: ["bun", "run", "dev"]
+
 volumes:
   postgres_data:
     driver: local

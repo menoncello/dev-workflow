@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev-plugin
+  labels:
+    name: dev-plugin
+    app: dev-plugin
+    environment: production
+  annotations:
+    description: "Dev Plugin application namespace"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev-plugin-staging
+  labels:
+    name: dev-plugin-staging
+    app: dev-plugin
+    environment: staging
+  annotations:
+    description: "Dev Plugin staging namespace"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev-plugin-dev
+  labels:
+    name: dev-plugin-dev
+    app: dev-plugin
+    environment: development
+  annotations:
+    description: "Dev Plugin development namespace"
