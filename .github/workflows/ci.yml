@@ -93,7 +93,7 @@ jobs:
 
     strategy:
       matrix:
-        environment: [dev, staging, production]
+        environment: ${{ github.event_name == 'pull_request' && fromJson('["dev", "staging"]') || fromJson('["dev", "staging", "production"]') }}
 
     steps:
       - name: Checkout code
