@@ -28,7 +28,7 @@ describe("Docker Build Tests", () => {
     expect(existsSync(dockerfilePath)).toBe(true);
 
     const dockerfileContent = await Bun.file(dockerfilePath).text();
-    expect(dockerfileContent).toContain("FROM oven/bun:1.1.33-alpine");
+    expect(dockerfileContent).toContain("FROM oven/bun:1.3.1-alpine");
     expect(dockerfileContent).toContain("AS base");
     expect(dockerfileContent).toContain("AS dependencies");
     expect(dockerfileContent).toContain("AS development");
