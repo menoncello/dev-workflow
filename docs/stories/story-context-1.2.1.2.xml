@@ -1,0 +1,124 @@
+<story-context id="bmad/bmm/workflows/4-implementation/story-context/template" v="1.0">
+  <metadata>
+    <epicId>1.2</epicId>
+    <storyId>1.2</storyId>
+    <title>Container & Deployment Infrastructure</title>
+    <status>Ready</status>
+    <generatedAt>2025-10-23</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/stories/story-1.2.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>DevOps engineer</asA>
+    <iWant>containerized deployment configuration</iWant>
+    <soThat>the system can be reliably deployed across environments</soThat>
+    <tasks>- Task 1: Create Docker configuration for multi-stage builds (AC: 1)
+  - Design multi-stage Dockerfile for development, staging, and production
+  - Optimize layer caching and build performance
+  - Configure health checks and startup probes
+  - Set up proper image tagging and versioning strategy
+- Task 2: Implement Docker Compose for local development (AC: 2)
+  - Create docker-compose.yml for local development services
+  - Configure PostgreSQL, Redis, and application containers
+  - Set up volume mounts for development code
+  - Configure environment variables and service dependencies
+- Task 3: Generate Kubernetes deployment manifests (AC: 3)
+  - Create deployment, service, and ingress manifests
+  - Configure ConfigMaps and Secrets management
+  - Set up resource limits and health checks
+  - Implement horizontal pod autoscaling configuration
+- Task 4: Establish environment configuration management (AC: 4)
+  - Create environment-specific configuration files
+  - Implement secure secrets management
+  - Set up configuration validation and defaults
+  - Document environment setup procedures
+- Task 5: Implement database migration automation (AC: 5)
+  - Create database migration scripts with Prisma
+  - Set up automated migration execution in deployment
+  - Configure rollback capabilities for failed migrations
+  - Add database backup and restore procedures</tasks>
+  </story>
+
+  <acceptanceCriteria>1. Docker configuration for multi-stage builds
+2. Docker Compose for local development
+3. Kubernetes deployment manifests
+4. Environment configuration management
+5. Database migration automation</acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc path="docs/stories/story-1.2.md" title="Story 1.2: Container & Deployment Infrastructure" section="Story Overview" snippet="Story 1.2 focuses on container and deployment infrastructure with 5 key acceptance criteria: Docker configuration for multi-stage builds, Docker Compose for local development, Kubernetes deployment manifests, environment configuration management, and database migration automation." />
+      <doc path="docs/architecture.md" title="Decision Architecture" section="Project Structure" snippet="Target structure includes docker-compose.yml for local development orchestration, docker-compose.prod.yml for production deployment, Dockerfile for multi-stage container builds, and scripts for build, deploy, and database migration operations." />
+      <doc path="docs/architecture.md" title="Decision Architecture" section="Deployment Architecture" snippet="Development environment uses Docker Compose for PostgreSQL + Redis orchestration with health checks, while production deployment supports zero-downtime deployment with staged containers and load balancer switching." />
+      <doc path="docs/PRD.md" title="Product Requirements Document" section="Functional Requirements" snippet="Core infrastructure requirements include FR001 (distributed agent architecture), FR003 (real-time agent coordination), and FR004 (database-backed state management) that directly impact container and deployment infrastructure decisions." />
+      <doc path="docker-compose.dev.yml" title="Docker Compose Development Configuration" section="Services Configuration" snippet="Development orchestration includes PostgreSQL 16-alpine with health checks, Redis 7-alpine for caching, Adminer for database management, and Redis Commander for Redis management with proper networking and volume persistence." />
+      <doc path=".github/workflows/docker.yml" title="Docker Build and Deploy CI/CD Pipeline" section="Pipeline Overview" snippet="GitHub Actions workflow for Docker builds with multi-platform support (linux/amd64, linux/arm64), security scanning using Trivy, and automated deployment stages for staging and production environments." />
+      <doc path="docs/test-design-epic-1.md" title="Test Design: Epic 1" section="Risk Assessment" snippet="High-priority risks include container deployment failures (R-005) requiring local Docker Compose fallback and deployment testing, and agent sandbox validation (R-003) for resource isolation security boundaries." />
+    </docs>
+    <code>
+      <code path="docker-compose.dev.yml" kind="docker-compose" symbol="local-development" lines="1-71" reason="Existing Docker Compose configuration for local development with PostgreSQL, Redis, Adminer and health checks - addresses AC#2" />
+      <code path=".env.example" kind="environment-config" symbol="env-template" lines="1-48" reason="Comprehensive environment variables template for server, database, auth, Redis, monitoring and agent settings - addresses AC#4" />
+      <code path="scripts/dev-setup.sh" kind="shell-script" symbol="dev-setup" lines="1-98" reason="Automated development environment setup with Docker Compose integration and service startup - deployment automation foundation" />
+      <code path="scripts/build-optimize.ts" kind="typescript-script" symbol="build-optimizer" lines="1-180" reason="Multi-environment build optimization supporting development, staging, and production builds - addresses AC#1" />
+      <code path="scripts/security-check.ts" kind="typescript-script" symbol="security-validator" lines="1-370" reason="Comprehensive security validation for containers and deployment including dependency checks and secrets exposure" />
+      <code path=".github/workflows/docker.yml" kind="github-actions" symbol="docker-pipeline" lines="1-152" reason="Docker build and deployment pipeline with multi-platform support, security scanning, and rollback capabilities - addresses AC#3" />
+      <code path="src/config/build.ts" kind="typescript-config" symbol="build-configs" lines="1-120" reason="Environment-specific build configurations for development, staging, and production with different optimization levels" />
+      <code path="src/utils/build.ts" kind="typescript-util" symbol="builder-class" lines="1-201" reason="Build execution utilities supporting multi-environment builds with size analysis and optimization" />
+      <code path="prisma/schema.prisma" kind="prisma-schema" symbol="database-schema" lines="1-37" reason="Database schema definition with PostgreSQL datasource, ready for migration generation - addresses AC#5" />
+      <code path="package.json" kind="package-config" symbol="main-scripts" lines="1-72" reason="Contains deployment-related scripts like deploy:staging, deploy:production, build:prod and security dependencies" />
+    </code>
+    <dependencies>
+      <dependency ecosystem="nodejs" name="bun" version=">=1.0.0" reason="Build tool and runtime" />
+      <dependency ecosystem="nodejs" name="elysia" version="latest" reason="Web framework for main application" />
+      <dependency ecosystem="nodejs" name="prisma" version="latest" reason="Database ORM for migration automation" />
+      <dependency ecosystem="nodejs" name="@biomejs/biome-cli" version="latest" reason="Code quality and formatting" />
+      <dependency ecosystem="docker" name="postgres" version="16-alpine" reason="Database for development and production" />
+      <dependency ecosystem="docker" name="redis" version="7-alpine" reason="Caching layer for application" />
+      <dependency ecosystem="github-actions" name="docker/build-push-action" version="latest" reason="Docker build automation" />
+      <dependency ecosystem="github-actions" name="aquasecurity/trivy-action" version="latest" reason="Container security scanning" />
+    </dependencies>
+  </artifacts>
+
+  <constraints>
+    <constraint type="architecture">Multi-stage Docker builds required for optimal image sizes and security</constraint>
+    <constraint type="deployment">Development environment must use Docker Compose for service orchestration</constraint>
+    <constraint type="security">All container images must pass security scanning with Trivy</constraint>
+    <constraint type="testing">Container build validation and smoke tests required for all environments</constraint>
+    <constraint type="configuration">Environment-specific configurations must be validated and documented</constraint>
+    <constraint type="migration">Database migrations must support rollback capabilities</constraint>
+    <constraint type="kubernetes">Production deployment supports horizontal pod autoscaling</constraint>
+    <constraint type="health-checks">All containers must include health checks and startup probes</constraint>
+  </constraints>
+  <interfaces>
+    <interface name="Docker Compose Services" kind="docker-compose" signature="services: { app, postgres, redis, adminer, redis-commander }" path="docker-compose.dev.yml" />
+    <interface name="Environment Variables" kind="env-config" signature="SERVER_PORT, DATABASE_URL, JWT_SECRET, REDIS_URL, MONITORING_ENABLED" path=".env.example" />
+    <interface name="Build Configuration" kind="typescript-interface" signature="BuildConfig { development, staging, production }" path="src/config/build.ts" />
+    <interface name="Database Schema" kind="prisma-model" signature="User, Auth models with PostgreSQL datasource" path="prisma/schema.prisma" />
+    <interface name="Security Validation" kind="typescript-function" signature="securityCheck(): Promise&lt;SecurityResult&gt;" path="scripts/security-check.ts" />
+    <interface name="CI/CD Pipeline" kind="github-actions-workflow" signature="jobs: { build, scan, deploy-staging, deploy-production }" path=".github/workflows/docker.yml" />
+  </interfaces>
+  <tests>
+    <standards>Testing framework: Bun's built-in test runner with TypeScript support. Quality gates include 100% test pass rate, Biome compliance, TypeScript strict mode, maximum test execution time of 1.5 minutes, and maximum test length of 300 lines. Container-specific testing requires security scanning with Trivy, environment configuration validation, migration testing on staging, Kubernetes manifest linting, and Docker Compose service startup validation. Performance thresholds: max startup time 5000ms, build time 10000ms, production bundle size 1MB.</standards>
+    <locations>
+      <location path="tests/" type="test-directory" description="Main test directory with smoke, integration, security, and unit tests" />
+      <location path="tests/container/" type="test-directory" description="Container-specific tests (to be created)" pattern="*.test.ts" />
+      <location path="tests/integration/" type="test-directory" description="Integration tests including API endpoints" pattern="*.test.ts" />
+      <location path="tests/security/" type="test-directory" description="Security validation tests" pattern="*.test.ts" />
+      <location path="scripts/test-setup.ts" type="test-script" description="Test setup and build validation script" />
+      <location path="scripts/quality-check.ts" type="test-script" description="Comprehensive quality analysis script" />
+      <location path="scripts/load-test.ts" type="test-script" description="Performance and load testing script" />
+      <location path="scripts/performance-health-check.ts" type="test-script" description="Performance threshold validation script" />
+    </locations>
+    <ideas>
+      <test idea="Container Build Validation" acceptanceCriteria="1" description="Validate multi-stage Docker builds for production with layer caching optimization and health checks" />
+      <test idea="Docker Compose Integration" acceptanceCriteria="2" description="Test Docker Compose orchestration for local development with PostgreSQL, Redis, and volume mounts" />
+      <test idea="Kubernetes Deployment Validation" acceptanceCriteria="3" description="Validate Kubernetes manifests, ConfigMaps, Secrets, resource limits, and HPA configuration" />
+      <test idea="Environment Configuration Testing" acceptanceCriteria="4" description="Test environment-specific configurations, validation, and setup procedures documentation" />
+      <test idea="Database Migration Testing" acceptanceCriteria="5" description="Test Prisma migration execution, rollback capabilities, and backup/restore procedures" />
+      <test idea="Container Security Scanning" acceptanceCriteria="1-5" description="Automated security scanning of container images using Trivy in CI/CD pipeline" />
+      <test idea="Health Check Validation" acceptanceCriteria="1,3" description="Test container health checks, startup probes, and liveness/readiness endpoints" />
+      <test idea="Performance Threshold Testing" acceptanceCriteria="1-5" description="Validate build times, startup times, bundle sizes against defined performance thresholds" />
+    </ideas>
+  </tests>
+</story-context>

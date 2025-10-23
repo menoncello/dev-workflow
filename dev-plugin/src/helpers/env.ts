@@ -3,37 +3,33 @@ import ajv from "#helpers/ajv";
 import { GlobalResponseError } from "./errors";
 
 const EnvModel = t.Object({
-	NODE_ENV: t.Optional(
-		t.Union([
-			t.Literal("development"),
-			t.Literal("staging"),
-			t.Literal("production"),
-			t.Literal("test"),
-		]),
-	),
-	SERVER_PORT: t.Number(),
-	DATABASE_URL: t.String(),
-	JWT_SECRET: t.String(),
-	JWT_EXPIRES_IN: t.Union([t.String(), t.Number()]),
+  NODE_ENV: t.Optional(
+    t.Union([
+      t.Literal("development"),
+      t.Literal("staging"),
+      t.Literal("production"),
+      t.Literal("test"),
+    ])
+  ),
+  SERVER_PORT: t.Number(),
+  DATABASE_URL: t.String(),
+  JWT_SECRET: t.String(),
+  JWT_EXPIRES_IN: t.Union([t.String(), t.Number()]),
 });
 
 const validate = ajv.compile(EnvModel);
 
 const isValidEnv = validate({
-	...process.env,
-	NODE_ENV: process.env.NODE_ENV
-		? process.env.NODE_ENV.toLowerCase()
-		: "development",
-	SERVER_PORT: process.env.SERVER_PORT
-		? Number(process.env.SERVER_PORT)
-		: 3000,
-	JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || "1d",
+  ...process.env,
+  NODE_ENV: process.env.NODE_ENV ? process.env.NODE_ENV.toLowerCase() : "development",
+  SERVER_PORT: process.env.SERVER_PORT ? Number(process.env.SERVER_PORT) : 3000,
+  JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || "1d",
 });
 
 if (isValidEnv === false) {
-	throw new GlobalResponseError(500, "Internal", {
-		server: "Invalid environment variables",
-	});
+  throw new GlobalResponseError(500, "Internal", {
+    server: "Invalid environment variables",
+  });
 }
 
 type ENV = typeof EnvModel.static;
