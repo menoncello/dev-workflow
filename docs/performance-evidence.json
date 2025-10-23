@@ -1,0 +1,62 @@
+{
+  "metadata": {
+    "generatedAt": "2025-10-22T22:54:32.874Z",
+    "testSuite": "Dev Plugin Load Testing Evidence",
+    "version": "1.0.0"
+  },
+  "summary": {
+    "totalTests": 3,
+    "totalRequests": 650,
+    "overallSuccessRate": 100,
+    "averageRequestsPerSecond": 15595.95288602972,
+    "averageResponseTime": 1.0424466294444483
+  },
+  "testResults": [
+    {
+      "testId": "test-1761173669826-9yt19c4r9",
+      "endpoint": "/api/health",
+      "totalRequests": 200,
+      "successfulRequests": 200,
+      "failedRequests": 0,
+      "successRate": "100.00%",
+      "averageResponseTime": "1.02ms",
+      "minResponseTime": "0.13ms",
+      "maxResponseTime": "2.13ms",
+      "requestsPerSecond": "14965.58",
+      "errorRate": "0.00%",
+      "testDuration": "0.01s",
+      "timestamp": "2025-10-22T22:54:29.840Z"
+    },
+    {
+      "testId": "test-1761173670842-m136ehtl0",
+      "endpoint": "/",
+      "totalRequests": 150,
+      "successfulRequests": 150,
+      "failedRequests": 0,
+      "successRate": "100.00%",
+      "averageResponseTime": "0.74ms",
+      "minResponseTime": "0.09ms",
+      "maxResponseTime": "1.36ms",
+      "requestsPerSecond": "15985.37",
+      "errorRate": "0.00%",
+      "testDuration": "0.01s",
+      "timestamp": "2025-10-22T22:54:30.851Z"
+    },
+    {
+      "testId": "test-1761173671853-6n5pze2tx",
+      "endpoint": "/api/v1/system/status",
+      "totalRequests": 300,
+      "successfulRequests": 300,
+      "failedRequests": 0,
+      "successRate": "100.00%",
+      "averageResponseTime": "1.37ms",
+      "minResponseTime": "0.09ms",
+      "maxResponseTime": "4.56ms",
+      "requestsPerSecond": "15836.91",
+      "errorRate": "0.00%",
+      "testDuration": "0.02s",
+      "timestamp": "2025-10-22T22:54:31.872Z"
+    }
+  ],
+  "performanceMetrics": "{\n  \"timestamp\": \"2025-10-22T22:54:32.874Z\",\n  \"totalRequests\": 0,\n  \"averageResponseTime\": 0,\n  \"requestsPerMinute\": 0,\n  \"errorRate\": 0,\n  \"memoryUsage\": {\n    \"rss\": 42237952,\n    \"heapTotal\": 1767424,\n    \"heapUsed\": 3620994,\n    \"external\": 2900018,\n    \"arrayBuffers\": 65648\n  },\n  \"endpointBreakdown\": {}\n}"
+}

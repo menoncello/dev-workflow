@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="bun test" tests="71" assertions="171" failures="2" skipped="0" time="0.168513">
+  <testsuite name="tests/smoke.test.ts" file="tests/smoke.test.ts" tests="5" assertions="10" failures="0" skipped="0" time="0" hostname="pro2">
+    <testsuite name="Project Foundation Smoke Tests" file="tests/smoke.test.ts" line="7" tests="5" assertions="10" failures="0" skipped="0" time="0.005" hostname="pro2">
+      <testcase name="should have basic TypeScript compilation" classname="Project Foundation Smoke Tests" time="0" file="tests/smoke.test.ts" line="8" assertions="1" />
+      <testcase name="should import core utilities" classname="Project Foundation Smoke Tests" time="0.005161" file="tests/smoke.test.ts" line="13" assertions="3" />
+      <testcase name="should generate valid UUIDs" classname="Project Foundation Smoke Tests" time="0.000313" file="tests/smoke.test.ts" line="22" assertions="1" />
+      <testcase name="should hash passwords consistently" classname="Project Foundation Smoke Tests" time="0.000165" file="tests/smoke.test.ts" line="29" assertions="4" />
+      <testcase name="should log messages without errors" classname="Project Foundation Smoke Tests" time="0.000079" file="tests/smoke.test.ts" line="44" assertions="1" />
+    </testsuite>
+  </testsuite>
+  <testsuite name="tests/security/auth.test.ts" file="tests/security/auth.test.ts" tests="7" assertions="19" failures="0" skipped="0" time="0" hostname="pro2">
+    <testsuite name="Authentication Security Tests" file="tests/security/auth.test.ts" line="3" tests="7" assertions="19" failures="0" skipped="0" time="0" hostname="pro2">
+      <testsuite name="Password Security" file="tests/security/auth.test.ts" line="7" tests="5" assertions="13" failures="0" skipped="0" time="0" hostname="pro2">
+        <testcase name="should hash passwords securely" classname="Password Security &amp;gt; Authentication Security Tests" time="0.000049" file="tests/security/auth.test.ts" line="8" assertions="5" />
+        <testcase name="should verify correct password hash" classname="Password Security &amp;gt; Authentication Security Tests" time="0" file="tests/security/auth.test.ts" line="21" assertions="1" />
+        <testcase name="should reject incorrect password" classname="Password Security &amp;gt; Authentication Security Tests" time="0" file="tests/security/auth.test.ts" line="31" assertions="1" />
+        <testcase name="should not store plaintext passwords" classname="Password Security &amp;gt; Authentication Security Tests" time="0.000113" file="tests/security/auth.test.ts" line="42" assertions="4" />
+        <testcase name="should generate different hashes for same password" classname="Password Security &amp;gt; Authentication Security Tests" time="0.000047" file="tests/security/auth.test.ts" line="55" assertions="2" />
+      </testsuite>
+      <testsuite name="Input Validation Security" file="tests/security/auth.test.ts" line="70" tests="2" assertions="6" failures="0" skipped="0" time="0" hostname="pro2">
+        <testcase name="should sanitize and validate user inputs" classname="Input Validation Security &amp;gt; Authentication Security Tests" time="0" file="tests/security/auth.test.ts" line="71" assertions="3" />
+        <testcase name="should prevent NoSQL injection attempts" classname="Input Validation Security &amp;gt; Authentication Security Tests" time="0.000126" file="tests/security/auth.test.ts" line="91" assertions="3" />
+      </testsuite>
+    </testsuite>
+  </testsuite>
+  <testsuite name="tests/security/secrets.test.ts" file="tests/security/secrets.test.ts" tests="13" assertions="32" failures="2" skipped="0" time="0" hostname="pro2">
+    <testsuite name="Secret Handling Security Tests" file="tests/security/secrets.test.ts" line="3" tests="13" assertions="32" failures="2" skipped="0" time="0" hostname="pro2">
+      <testsuite name="Data Encryption" file="tests/security/secrets.test.ts" line="4" tests="5" assertions="12" failures="0" skipped="0" time="0" hostname="pro2">
+        <testcase name="should encrypt sensitive data with XOR" classname="Data Encryption &amp;gt; Secret Handling Security Tests" time="0.00015" file="tests/security/secrets.test.ts" line="5" assertions="3" />
+        <testcase name="should decrypt sensitive data correctly with XOR" classname="Data Encryption &amp;gt; Secret Handling Security Tests" time="0.000067" file="tests/security/secrets.test.ts" line="17" assertions="1" />
+        <testcase name="should fail to decrypt with wrong key" classname="Data Encryption &amp;gt; Secret Handling Security Tests" time="0.000037" file="tests/security/secrets.test.ts" line="28" assertions="1" />
+        <testcase name="should produce consistent encrypted data with XOR" classname="Data Encryption &amp;gt; Secret Handling Security Tests" time="0.000042" file="tests/security/secrets.test.ts" line="40" assertions="3" />
+        <testcase name="should hash passwords securely" classname="Data Encryption &amp;gt; Secret Handling Security Tests" time="0.00005" file="tests/security/secrets.test.ts" line="55" assertions="4" />
+      </testsuite>
+      <testsuite name="Secret Logging Prevention" file="tests/security/secrets.test.ts" line="68" tests="2" assertions="14" failures="1" skipped="0" time="0" hostname="pro2">
+        <testcase name="should not log sensitive data in production" classname="Secret Logging Prevention &amp;gt; Secret Handling Security Tests" time="0.000266" file="tests/security/secrets.test.ts" line="69" assertions="4">
+          <failure type="AssertionError" />
+        </testcase>
+        <testcase name="should redact sensitive fields in error objects" classname="Secret Logging Prevention &amp;gt; Secret Handling Security Tests" time="0.000276" file="tests/security/secrets.test.ts" line="134" assertions="10" />
+      </testsuite>
+      <testsuite name="Environment Variable Security" file="tests/security/secrets.test.ts" line="173" tests="2" assertions="1" failures="0" skipped="0" time="0" hostname="pro2">
+        <testcase name="should validate required environment variables" classname="Environment Variable Security &amp;gt; Secret Handling Security Tests" time="0.000049" file="tests/security/secrets.test.ts" line="174" assertions="0" />
+        <testcase name="should not expose environment variables in error messages" classname="Environment Variable Security &amp;gt; Secret Handling Security Tests" time="0.000037" file="tests/security/secrets.test.ts" line="198" assertions="1" />
+      </testsuite>
+      <testsuite name="API Key Security" file="tests/security/secrets.test.ts" line="220" tests="2" assertions="2" failures="1" skipped="0" time="0" hostname="pro2">
+        <testcase name="should validate API key format" classname="API Key Security &amp;gt; Secret Handling Security Tests" time="0.000123" file="tests/security/secrets.test.ts" line="221" assertions="1">
+          <failure type="AssertionError" />
+        </testcase>
+        <testcase name="should not log API keys" classname="API Key Security &amp;gt; Secret Handling Security Tests" time="0.00004" file="tests/security/secrets.test.ts" line="244" assertions="1" />
+      </testsuite>
+      <testsuite name="Database Connection Security" file="tests/security/secrets.test.ts" line="275" tests="2" assertions="3" failures="0" skipped="0" time="0" hostname="pro2">
+        <testcase name="should use secure database connection string" classname="Database Connection Security &amp;gt; Secret Handling Security Tests" time="0.00002" file="tests/security/secrets.test.ts" line="276" assertions="0" />
+        <testcase name="should sanitize database query errors" classname="Database Connection Security &amp;gt; Secret Handling Security Tests" time="0.00012" file="tests/security/secrets.test.ts" line="291" assertions="3" />
+      </testsuite>
+    </testsuite>
+  </testsuite>
+  <testsuite name="tests/integration/api.test.ts" file="tests/integration/api.test.ts" tests="11" assertions="42" failures="0" skipped="0" time="0" hostname="pro2">
+    <testsuite name="API Integration Tests" file="tests/integration/api.test.ts" line="7" tests="11" assertions="42" failures="0" skipped="0" time="0" hostname="pro2">
+      <testsuite name="System Endpoints" file="tests/integration/api.test.ts" line="8" tests="4" assertions="19" failures="0" skipped="0" time="0.023" hostname="pro2">
+        <testcase name="should return health check" classname="System Endpoints &amp;gt; API Integration Tests" time="0.023706" file="tests/integration/api.test.ts" line="9" assertions="5" />
+        <testcase name="should return system status" classname="System Endpoints &amp;gt; API Integration Tests" time="0.000413" file="tests/integration/api.test.ts" line="27" assertions="4" />
+        <testcase name="should return system metrics" classname="System Endpoints &amp;gt; API Integration Tests" time="0.000312" file="tests/integration/api.test.ts" line="43" assertions="6" />
+        <testcase name="should return version information" classname="System Endpoints &amp;gt; API Integration Tests" time="0.000312" file="tests/integration/api.test.ts" line="61" assertions="4" />
+      </testsuite>
+      <testsuite name="Agent Endpoints" file="tests/integration/api.test.ts" line="78" tests="3" assertions="9" failures="0" skipped="0" time="0.007" hostname="pro2">
+        <testcase name="should list agents" classname="Agent Endpoints &amp;gt; API Integration Tests" time="0.002681" file="tests/integration/api.test.ts" line="79" assertions="4" />
+        <testcase name="should create an agent" classname="Agent Endpoints &amp;gt; API Integration Tests" time="0.004372" file="tests/integration/api.test.ts" line="95" assertions="3" />
+        <testcase name="should get an agent" classname="Agent Endpoints &amp;gt; API Integration Tests" time="0.00113" file="tests/integration/api.test.ts" line="133" assertions="2" />
+      </testsuite>
+      <testsuite name="Workflow Endpoints" file="tests/integration/api.test.ts" line="148" tests="2" assertions="7" failures="0" skipped="0" time="0" hostname="pro2">
+        <testcase name="should list workflows" classname="Workflow Endpoints &amp;gt; API Integration Tests" time="0.000971" file="tests/integration/api.test.ts" line="149" assertions="4" />
+        <testcase name="should create a workflow" classname="Workflow Endpoints &amp;gt; API Integration Tests" time="0.000835" file="tests/integration/api.test.ts" line="165" assertions="3" />
+      </testsuite>
+      <testsuite name="Tool Endpoints" file="tests/integration/api.test.ts" line="198" tests="2" assertions="7" failures="0" skipped="0" time="0.002" hostname="pro2">
+        <testcase name="should list tools" classname="Tool Endpoints &amp;gt; API Integration Tests" time="0.001147" file="tests/integration/api.test.ts" line="199" assertions="4" />
+        <testcase name="should create a tool" classname="Tool Endpoints &amp;gt; API Integration Tests" time="0.00103" file="tests/integration/api.test.ts" line="215" assertions="3" />
+      </testsuite>
+    </testsuite>
+  </testsuite>
+  <testsuite name="tests/build/build.test.ts" file="tests/build/build.test.ts" tests="11" assertions="33" failures="0" skipped="0" time="0" hostname="pro2">
+    <testsuite name="Build System" file="tests/build/build.test.ts" line="10" tests="11" assertions="33" failures="0" skipped="0" time="0" hostname="pro2">
+      <testsuite name="Development Build" file="tests/build/build.test.ts" line="47" tests="2" assertions="4" failures="0" skipped="0" time="0.032" hostname="pro2">
+        <testcase name="should build successfully for development" classname="Development Build &amp;gt; Build System" time="0.031402" file="tests/build/build.test.ts" line="48" assertions="3" />
+        <testcase name="should include source maps" classname="Development Build &amp;gt; Build System" time="0.001206" file="tests/build/build.test.ts" line="56" assertions="1" />
+      </testsuite>
+      <testsuite name="Production Build" file="tests/build/build.test.ts" line="70" tests="3" assertions="7" failures="0" skipped="0" time="0.049" hostname="pro2">
+        <testcase name="should build successfully for production" classname="Production Build &amp;gt; Build System" time="0.014139" file="tests/build/build.test.ts" line="71" assertions="3" />
+        <testcase name="should produce optimized build" classname="Production Build &amp;gt; Build System" time="0.035389" file="tests/build/build.test.ts" line="79" assertions="3" />
+        <testcase name="should not include source maps in production" classname="Production Build &amp;gt; Build System" time="0.000231" file="tests/build/build.test.ts" line="90" assertions="1" />
+      </testsuite>
+      <testsuite name="Staging Build" file="tests/build/build.test.ts" line="105" tests="2" assertions="4" failures="0" skipped="0" time="0.021" hostname="pro2">
+        <testcase name="should build successfully for staging" classname="Staging Build &amp;gt; Build System" time="0.020564" file="tests/build/build.test.ts" line="106" assertions="3" />
+        <testcase name="should include source maps for debugging" classname="Staging Build &amp;gt; Build System" time="0.001239" file="tests/build/build.test.ts" line="114" assertions="1" />
+      </testsuite>
+      <testsuite name="Build Configuration Validation" file="tests/build/build.test.ts" line="128" tests="2" assertions="9" failures="0" skipped="0" time="0" hostname="pro2">
+        <testcase name="should have correct build configurations" classname="Build Configuration Validation &amp;gt; Build System" time="0" file="tests/build/build.test.ts" line="129" assertions="3" />
+        <testcase name="should have appropriate settings for each environment" classname="Build Configuration Validation &amp;gt; Build System" time="0" file="tests/build/build.test.ts" line="137" assertions="6" />
+      </testsuite>
+      <testsuite name="Build Outputs" file="tests/build/build.test.ts" line="154" tests="2" assertions="9" failures="0" skipped="0" time="0" hostname="pro2">
+        <testcase name="should create appropriate output directories" classname="Build Outputs &amp;gt; Build System" time="0.000719" file="tests/build/build.test.ts" line="155" assertions="6" />
+        <testcase name="should generate JavaScript bundle files" classname="Build Outputs &amp;gt; Build System" time="0.000286" file="tests/build/build.test.ts" line="171" assertions="3" />
+      </testsuite>
+    </testsuite>
+  </testsuite>
+  <testsuite name="tests/unit/utils/crypto.test.ts" file="tests/unit/utils/crypto.test.ts" tests="19" assertions="22" failures="0" skipped="0" time="0" hostname="pro2">
+    <testsuite name="Crypto Utils" file="tests/unit/utils/crypto.test.ts" line="19" tests="19" assertions="22" failures="0" skipped="0" time="0" hostname="pro2">
+      <testsuite name="generateRandomString" file="tests/unit/utils/crypto.test.ts" line="20" tests="2" assertions="3" failures="0" skipped="0" time="0" hostname="pro2">
+        <testcase name="should generate a random string of default length" classname="generateRandomString &amp;gt; Crypto Utils" time="0" file="tests/unit/utils/crypto.test.ts" line="21" assertions="2" />
+        <testcase name="should generate a random string of specified length" classname="generateRandomString &amp;gt; Crypto Utils" time="0" file="tests/unit/utils/crypto.test.ts" line="27" assertions="1" />
+      </testsuite>
+      <testsuite name="generateUUID" file="tests/unit/utils/crypto.test.ts" line="33" tests="2" assertions="2" failures="0" skipped="0" time="0" hostname="pro2">
+        <testcase name="should generate a valid UUID v4" classname="generateUUID &amp;gt; Crypto Utils" time="0" file="tests/unit/utils/crypto.test.ts" line="34" assertions="1" />
+        <testcase name="should generate unique UUIDs" classname="generateUUID &amp;gt; Crypto Utils" time="0" file="tests/unit/utils/crypto.test.ts" line="41" assertions="1" />
+      </testsuite>
+      <testsuite name="sha256" file="tests/unit/utils/crypto.test.ts" line="48" tests="2" assertions="3" failures="0" skipped="0" time="0" hostname="pro2">
+        <testcase name="should generate consistent SHA-256 hash" classname="sha256 &amp;gt; Crypto Utils" time="0" file="tests/unit/utils/crypto.test.ts" line="49" assertions="2" />
+        <testcase name="should generate different hashes for different data" classname="sha256 &amp;gt; Crypto Utils" time="0.000048" file="tests/unit/utils/crypto.test.ts" line="57" assertions="1" />
+      </testsuite>
+      <testsuite name="sha256WithSalt" file="tests/unit/utils/crypto.test.ts" line="64" tests="1" assertions="1" failures="0" skipped="0" time="0" hostname="pro2">
+        <testcase name="should generate different hashes with different salts" classname="sha256WithSalt &amp;gt; Crypto Utils" time="0" file="tests/unit/utils/crypto.test.ts" line="65" assertions="1" />
+      </testsuite>
+      <testsuite name="generateSalt" file="tests/unit/utils/crypto.test.ts" line="75" tests="2" assertions="2" failures="0" skipped="0" time="0" hostname="pro2">
+        <testcase name="should generate a salt of default length" classname="generateSalt &amp;gt; Crypto Utils" time="0" file="tests/unit/utils/crypto.test.ts" line="76" assertions="1" />
+        <testcase name="should generate unique salts" classname="generateSalt &amp;gt; Crypto Utils" time="0" file="tests/unit/utils/crypto.test.ts" line="81" assertions="1" />
+      </testsuite>
+      <testsuite name="hashPassword" file="tests/unit/utils/crypto.test.ts" line="88" tests="2" assertions="3" failures="0" skipped="0" time="0" hostname="pro2">
+        <testcase name="should hash a password with salt" classname="hashPassword &amp;gt; Crypto Utils" time="0" file="tests/unit/utils/crypto.test.ts" line="89" assertions="2" />
+        <testcase name="should generate different hashes for the same password" classname="hashPassword &amp;gt; Crypto Utils" time="0" file="tests/unit/utils/crypto.test.ts" line="96" assertions="1" />
+      </testsuite>
+      <testsuite name="verifyPassword" file="tests/unit/utils/crypto.test.ts" line="104" tests="2" assertions="2" failures="0" skipped="0" time="0" hostname="pro2">
+        <testcase name="should verify correct password" classname="verifyPassword &amp;gt; Crypto Utils" time="0" file="tests/unit/utils/crypto.test.ts" line="105" assertions="1" />
+        <testcase name="should reject incorrect password" classname="verifyPassword &amp;gt; Crypto Utils" time="0" file="tests/unit/utils/crypto.test.ts" line="111" assertions="1" />
+      </testsuite>
+      <testsuite name="generateApiKey" file="tests/unit/utils/crypto.test.ts" line="119" tests="3" assertions="3" failures="0" skipped="0" time="0" hostname="pro2">
+        <testcase name="should generate an API key with default prefix" classname="generateApiKey &amp;gt; Crypto Utils" time="0" file="tests/unit/utils/crypto.test.ts" line="120" assertions="1" />
+        <testcase name="should generate an API key with custom prefix" classname="generateApiKey &amp;gt; Crypto Utils" time="0" file="tests/unit/utils/crypto.test.ts" line="125" assertions="1" />
+        <testcase name="should generate unique API keys" classname="generateApiKey &amp;gt; Crypto Utils" time="0" file="tests/unit/utils/crypto.test.ts" line="130" assertions="1" />
+      </testsuite>
+      <testsuite name="xor encryption" file="tests/unit/utils/crypto.test.ts" line="137" tests="3" assertions="3" failures="0" skipped="0" time="0" hostname="pro2">
+        <testcase name="should encrypt and decrypt text correctly" classname="xor encryption &amp;gt; Crypto Utils" time="0" file="tests/unit/utils/crypto.test.ts" line="138" assertions="1" />
+        <testcase name="should produce different encrypted text for different keys" classname="xor encryption &amp;gt; Crypto Utils" time="0" file="tests/unit/utils/crypto.test.ts" line="146" assertions="1" />
+        <testcase name="should fail to decrypt with wrong key" classname="xor encryption &amp;gt; Crypto Utils" time="0" file="tests/unit/utils/crypto.test.ts" line="155" assertions="1" />
+      </testsuite>
+    </testsuite>
+  </testsuite>
+  <testsuite name="tests/unit/utils/logger.test.ts" file="tests/unit/utils/logger.test.ts" tests="5" assertions="13" failures="0" skipped="0" time="0" hostname="pro2">
+    <testsuite name="Logger" file="tests/unit/utils/logger.test.ts" line="8" tests="5" assertions="13" failures="0" skipped="0" time="0" hostname="pro2">
+      <testcase name="should create a logger with default context" classname="Logger" time="0" file="tests/unit/utils/logger.test.ts" line="9" assertions="1" />
+      <testcase name="should have log methods available" classname="Logger" time="0" file="tests/unit/utils/logger.test.ts" line="14" assertions="4" />
+      <testcase name="should create child logger with additional context" classname="Logger" time="0" file="tests/unit/utils/logger.test.ts" line="21" assertions="2" />
+      <testcase name="should handle logging without throwing errors" classname="Logger" time="0" file="tests/unit/utils/logger.test.ts" line="27" assertions="1" />
+      <testcase name="should generate trace IDs" classname="Logger" time="0" file="tests/unit/utils/logger.test.ts" line="36" assertions="5" />
+    </testsuite>
+  </testsuite>
+</testsuites>
