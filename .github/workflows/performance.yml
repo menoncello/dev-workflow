@@ -1,0 +1,256 @@
+name: Performance Monitoring
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 6 * * *'  # Daily at 6 AM UTC
+
+jobs:
+  bundle-analysis:
+    name: Bundle Size Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: bun run db:generate
+
+      - name: Build production bundle
+        run: bun run build:prod
+
+      - name: Analyze bundle size
+        run: |
+          echo "📦 Bundle Size Analysis"
+          echo "====================="
+
+          PROD_SIZE=$(stat -c%s build/prod/src/index.js)
+          PROD_SIZE_MB=$(echo "scale=2; $PROD_SIZE / 1024 / 1024" | bc)
+
+          echo "Production bundle: ${PROD_SIZE_MB} MB (${PROD_SIZE} bytes)"
+
+          # Check against 1MB threshold
+          if [ $PROD_SIZE -gt 1048576 ]; then
+            echo "❌ FAIL: Production bundle exceeds 1MB threshold"
+            echo "Current: ${PROD_SIZE_MB} MB, Threshold: 1.0 MB"
+            exit 1
+          else
+            echo "✅ PASS: Production bundle within 1MB threshold"
+          fi
+
+      - name: Build staging bundle
+        run: bun run build:staging
+
+      - name: Analyze staging bundle
+        run: |
+          echo ""
+          echo "📦 Staging Bundle Analysis"
+          echo "========================"
+
+          STAGING_SIZE=$(stat -c%s build/staging/src/index.js)
+          STAGING_SIZE_MB=$(echo "scale=2; $STAGING_SIZE / 1024 / 1024" | bc)
+
+          echo "Staging bundle: ${STAGING_SIZE_MB} MB (${STAGING_SIZE} bytes)"
+
+          # Check against 2MB threshold
+          if [ $STAGING_SIZE -gt 2097152 ]; then
+            echo "⚠️ WARNING: Staging bundle exceeds 2MB threshold"
+            echo "Current: ${STAGING_SIZE_MB} MB, Threshold: 2.0 MB"
+            echo "Consider optimizing source maps for staging builds"
+          else
+            echo "✅ PASS: Staging bundle within 2MB threshold"
+          fi
+
+      - name: Compare with previous build
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "📊 Comparing with base branch..."
+          # Add bundle size comparison logic here
+
+  build-performance:
+    name: Build Performance Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Measure build performance
+        run: |
+          echo "⏱️ Build Performance Test"
+          echo "========================"
+
+          # Test production build time
+          echo "Testing production build..."
+          START_TIME=$(date +%s%N)
+          bun run build:prod
+          END_TIME=$(date +%s%N)
+
+          BUILD_TIME_MS=$(( (END_TIME - START_TIME) / 1000000 ))
+          BUILD_TIME_S=$(echo "scale=2; $BUILD_TIME_MS / 1000" | bc)
+
+          echo "Production build time: ${BUILD_TIME_S}s (${BUILD_TIME_MS}ms)"
+
+          # Check against 30 second threshold
+          if [ $BUILD_TIME_MS -gt 30000 ]; then
+            echo "⚠️ WARNING: Build time exceeds 30s threshold"
+            echo "Current: ${BUILD_TIME_S}s, Threshold: 30s"
+          else
+            echo "✅ PASS: Build time within 30s threshold"
+          fi
+
+      - name: Save build metrics
+        run: |
+          echo "build_time_ms=${BUILD_TIME_MS}" >> build-metrics.txt
+          echo "bundle_size_bytes=${PROD_SIZE}" >> build-metrics.txt
+          echo "timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> build-metrics.txt
+
+      - name: Upload build metrics
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-metrics
+          path: build-metrics.txt
+          retention-days: 90
+
+  lighthouse-performance:
+    name: Lighthouse Performance Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build application
+        run: bun run build:prod
+
+      - name: Start application
+        run: |
+          cd build/prod
+          NODE_ENV=production bun src/index.js &
+          sleep 10
+
+      - name: Run Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v10
+        with:
+          configPath: '.lighthouserc.json'
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+
+  performance-regression:
+    name: Performance Regression Detection
+    runs-on: ubuntu-latest
+    timeout-minuments: 10
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build current version
+        run: |
+          bun run build:prod
+          CURRENT_SIZE=$(stat -c%s build/prod/src/index.js)
+          echo "current_size=${CURRENT_SIZE}" >> current-metrics.txt
+
+      - name: Build base version
+        run: |
+          git checkout origin/${{ github.base_ref }}
+          bun install --frozen-lockfile
+          bun run build:prod
+          BASE_SIZE=$(stat -c%s build/prod/src/index.js)
+          echo "base_size=${BASE_SIZE}" >> base-metrics.txt
+
+      - name: Compare bundle sizes
+        run: |
+          echo "📊 Bundle Size Comparison"
+          echo "=========================="
+
+          CURRENT_SIZE=$(grep current_size current-metrics.txt | cut -d= -f2)
+          BASE_SIZE=$(grep base_size base-metrics.txt | cut -d= -f2)
+
+          CURRENT_SIZE_MB=$(echo "scale=2; $CURRENT_SIZE / 1024 / 1024" | bc)
+          BASE_SIZE_MB=$(echo "scale=2; $BASE_SIZE / 1024 / 1024" | bc)
+
+          DIFF=$((CURRENT_SIZE - BASE_SIZE))
+          DIFF_PERCENT=$(echo "scale=2; $DIFF * 100 / $BASE_SIZE" | bc)
+
+          echo "Base bundle: ${BASE_SIZE_MB} MB"
+          echo "Current bundle: ${CURRENT_SIZE_MB} MB"
+          echo "Difference: ${DIFF_PERCENT}%"
+
+          # Alert on significant increases
+          if [ $DIFF -gt 104857 ]; then  # 100KB increase
+            echo "⚠️ WARNING: Bundle size increased significantly"
+            echo "Increase: ${DIFF_PERCENT}%"
+          else
+            echo "✅ PASS: Bundle size change acceptable"
+          fi
+
+  performance-report:
+    name: Performance Report
+    runs-on: ubuntu-latest
+    needs: [bundle-analysis, build-performance]
+    if: always()
+
+    steps:
+      - name: Generate performance report
+        run: |
+          echo "📈 Performance Report" > performance-report.md
+          echo "=====================" >> performance-report.md
+          echo "" >> performance-report.md
+          echo "**Build:** ${{ github.sha }}" >> performance-report.md
+          echo "**Branch:** ${{ github.ref_name }}" >> performance-report.md
+          echo "**Date:** $(date)" >> performance-report.md
+          echo "" >> performance-report.md
+          echo "## Performance Gates Status" >> performance-report.md
+          echo "- Bundle Analysis: ${{ needs.bundle-analysis.result }}" >> performance-report.md
+          echo "- Build Performance: ${{ needs.build-performance.result }}" >> performance-report.md
+
+      - name: Upload performance report
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-report
+          path: performance-report.md
+          retention-days: 30

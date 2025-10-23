@@ -1,0 +1,64 @@
+name: Dependency Update
+
+on:
+  schedule:
+    - cron: '0 2 * * 1'  # Weekly on Monday at 2 AM UTC
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  update-dependencies:
+    name: Update Dependencies
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Update dependencies
+        run: |
+          echo "🔄 Updating dependencies..."
+          bun update
+
+      - name: Run tests
+        run: bun test
+
+      - name: Check for build issues
+        run: |
+          bun run build:prod
+          bun run build:staging
+          bun run build:dev
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: '🔄 chore: update dependencies'
+          title: '🔄 chore: update dependencies'
+          body: |
+            ## Automated Dependency Update
+
+            This PR contains automated dependency updates:
+
+            - Updated all dependencies to latest versions
+            - All tests are passing
+            - All builds are successful
+
+            **Please review:**
+            - [ ] All tests pass
+            - [ ] Build process works correctly
+            - [ ] No breaking changes introduced
+
+            **Merge guidelines:**
+            - Review test results
+            - Check for any breaking changes
+            - Test in staging environment if needed
+          branch: dependency-updates
+          delete-branch: true

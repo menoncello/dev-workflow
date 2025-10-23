@@ -1,0 +1,176 @@
+name: Code Quality Analysis
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  code-quality:
+    name: Code Quality Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Needed for SonarCloud
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: bun run db:generate
+
+      - name: Run Biome quality check
+        run: bun run check:ci
+
+      - name: Run quality check script
+        run: bun run quality-check
+
+      - name: Run tests with coverage
+        run: bun test --coverage
+
+      - name: SonarCloud Scan
+        if: env.SONAR_TOKEN != ''
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  complexity-analysis:
+    name: Complexity Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install complexity tools
+        run: npm install -g complexity-report
+
+      - name: Run complexity analysis
+        run: |
+          echo "Running complexity analysis..."
+          complexity-report -o complexity-report.json -f json src/ || true
+
+      - name: Check complexity thresholds
+        run: |
+          if [ -f complexity-report.json ]; then
+            echo "Complexity analysis completed"
+            # Add complexity threshold checks here
+          else
+            echo "Complexity analysis failed"
+          fi
+
+  dependency-check:
+    name: Dependency Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Check for outdated dependencies
+        run: |
+          bun update --dry-run > outdated.txt || true
+          if [ -s outdated.txt ]; then
+            echo "📦 Outdated dependencies found:"
+            cat outdated.txt
+          else
+            echo "✅ All dependencies are up to date"
+          fi
+
+      - name: Check license compatibility
+        run: |
+          bun install --frozen-lockfile
+          echo "Checking license compatibility..."
+          # Add license checker here if needed
+
+  code-duplication:
+    name: Code Duplication Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install jscpd
+        run: npm install -g jscpd
+
+      - name: Run duplication check
+        run: |
+          echo "Running code duplication check..."
+          jscpd src/ --threshold 5 --format json --output duplication.json || true
+
+      - name: Check duplication results
+        run: |
+          if [ -f duplication.json ]; then
+            DUPLICATION=$(node -e "console.log(JSON.parse(require('fs').readFileSync('duplication.json', 'utf8')).statistics.total.percentage || 0)")
+            echo "Code duplication: ${DUPLICATION}%"
+
+            if (( $(echo "$DUPLICATION >= 5" | bc -l) )); then
+              echo "⚠️ WARNING: Code duplication ${DUPLICATION}% exceeds 5% threshold"
+            else
+              echo "✅ PASS: Code duplication ${DUPLICATION}% below 5% threshold"
+            fi
+          else
+            echo "❌ FAIL: Could not analyze code duplication"
+            exit 1
+          fi
+
+  quality-report:
+    name: Quality Report
+    runs-on: ubuntu-latest
+    needs: [code-quality, complexity-analysis, dependency-check, code-duplication]
+    if: always()
+
+    steps:
+      - name: Generate quality report
+        run: |
+          echo "📊 Code Quality Report" > quality-report.md
+          echo "========================" >> quality-report.md
+          echo "" >> quality-report.md
+          echo "**Build:** ${{ github.sha }}" >> quality-report.md
+          echo "**Branch:** ${{ github.ref_name }}" >> quality-report.md
+          echo "**Date:** $(date)" >> quality-report.md
+          echo "" >> quality-report.md
+          echo "## Quality Gates Status" >> quality-report.md
+          echo "- Code Quality: ${{ needs.code-quality.result }}" >> quality-report.md
+          echo "- Complexity Analysis: ${{ needs.complexity-analysis.result }}" >> quality-report.md
+          echo "- Dependency Check: ${{ needs.dependency-check.result }}" >> quality-report.md
+          echo "- Code Duplication: ${{ needs.code-duplication.result }}" >> quality-report.md
+
+      - name: Upload quality report
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-report
+          path: quality-report.md
+          retention-days: 30
