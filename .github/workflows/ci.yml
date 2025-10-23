@@ -119,8 +119,13 @@ jobs:
           echo "Current directory: $(pwd)"
           echo "Build command: bun run build:${{ matrix.environment }}"
 
-          # Run build with verbose output
-          bun run build:${{ matrix.environment }}
+          # Run build with verbose output and debugging
+          set -x
+          bun run build:${{ matrix.environment }} || {
+            echo "❌ Build failed, checking error details..."
+            ls -la build/ || echo "No build directory found"
+            exit 1
+          }
 
           echo "✅ ${{ matrix.environment }} build completed"
 

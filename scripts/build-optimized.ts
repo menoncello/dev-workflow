@@ -119,16 +119,12 @@ async function buildForEnvironment(environment: string): Promise<BuildResult> {
       }
     }
 
-    // Ultra-aggressive production optimization
+    // Simplified production optimization
     if (environment === "production") {
-      // Override entrypoint to minimize initial bundle
+      // Keep simple configuration for production
       buildConfig.entrypoints = ["src/index.ts"];
-
-      // Force maximum splitting
-      buildConfig.splitting = true;
-
-      // Ultra-aggressive minification
       buildConfig.minify = true;
+      buildConfig.splitting = true;
 
       // Remove all development code
       buildConfig.define = {
