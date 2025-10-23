@@ -119,16 +119,12 @@ async function buildForEnvironment(environment: string): Promise<BuildResult> {
       }
     }
 
-    // Ultra-aggressive production optimization
+    // Simplified production optimization
     if (environment === "production") {
-      // Override entrypoint to minimize initial bundle
+      // Keep simple configuration for production
       buildConfig.entrypoints = ["src/index.ts"];
-
-      // Force maximum splitting
-      buildConfig.splitting = true;
-
-      // Ultra-aggressive minification
       buildConfig.minify = true;
+      buildConfig.splitting = true;
 
       // Remove all development code
       buildConfig.define = {
@@ -137,7 +133,8 @@ async function buildForEnvironment(environment: string): Promise<BuildResult> {
       };
     }
 
-    // Build with Bun
+    // Build with Bun - simplified approach
+    console.log("Build config:", JSON.stringify(buildConfig, null, 2));
     const _result = await build(buildConfig);
 
     const buildTime = Date.now() - startTime;
@@ -169,10 +166,23 @@ async function buildForEnvironment(environment: string): Promise<BuildResult> {
     };
   } catch (error) {
     console.error(`❌ ${environment.toUpperCase()} build failed:`, error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("Error details:", errorMessage);
+    console.error("Stack:", error instanceof Error ? error.stack : "No stack available");
+
+    // Check if it's a known error type
+    if (errorMessage.includes("ENOENT") || errorMessage.includes("no such file")) {
+      console.error("📁 File/directory not found error. Check build paths.");
+    }
+
+    if (errorMessage.includes("EACCES") || errorMessage.includes("permission")) {
+      console.error("🔒 Permission error. Check file permissions.");
+    }
+
     return {
       success: false,
       size: 0,
-      errors: [error instanceof Error ? error.message : String(error)],
+      errors: [errorMessage],
       outputPath: config.outdir,
     };
   }
