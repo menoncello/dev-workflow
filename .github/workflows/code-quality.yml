@@ -54,14 +54,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
         with:
-          node-version: '20'
-          cache: 'npm'
+          bun-version: latest
 
       - name: Install complexity tools
-        run: npm install -g complexity-report
+        run: bun add -g complexity-report && sudo apt-get update && sudo apt-get install -y bc
 
       - name: Run complexity analysis
         run: |
@@ -116,14 +115,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
         with:
-          node-version: '20'
-          cache: 'npm'
+          bun-version: latest
 
       - name: Install jscpd
-        run: npm install -g jscpd
+        run: bun add -g jscpd && sudo apt-get update && sudo apt-get install -y bc
 
       - name: Run duplication check
         run: |
@@ -133,7 +131,8 @@ jobs:
       - name: Check duplication results
         run: |
           if [ -f duplication.json ]; then
-            DUPLICATION=$(node -e "console.log(JSON.parse(require('fs').readFileSync('duplication.json', 'utf8')).statistics.total.percentage || 0)")
+            # Use Bun to parse JSON instead of Node.js require
+            DUPLICATION=$(bun -e "console.log(JSON.parse(await Bun.file('duplication.json').text()).statistics.total.percentage || 0)")
             echo "Code duplication: ${DUPLICATION}%"
 
             if (( $(echo "$DUPLICATION >= 5" | bc -l) )); then
