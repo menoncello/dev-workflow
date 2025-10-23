@@ -11,7 +11,7 @@
     "check:ci": "bunx biome check",
     "format": "bunx biome format --write",
     "format:check": "bunx biome format",
-    "typecheck": "bun tsc --noEmit",
+    "typecheck": "bunx tsc --noEmit",
     "dev": "bun run --watch --watch-config src/config/fast-watch.ts src/index.ts",
     "dev:debug": "bun run --inspect --watch --watch-config src/config/fast-watch.ts src/index.ts",
     "dev:hot": "bun run --watch --hot --watch-config src/config/fast-watch.ts src/index.ts",
