@@ -2,7 +2,7 @@
 # Supports development, staging, and production builds with optimized layer caching
 
 # Base stage - Common dependencies
-FROM oven/bun:1.1.33-alpine AS base
+FROM oven/bun:1.3.1-alpine AS base
 WORKDIR /app
 
 # Install system dependencies
