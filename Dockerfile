@@ -93,8 +93,9 @@ CMD ["bun", "run", "start"]
 
 # Staging runtime stage (similar to production but with staging-specific config)
 FROM base AS staging
-RUN addgroup --system --gid 1001 bun \
-    && adduser --system --uid 1001 bun
+# Use existing bun user/group or create if needed
+RUN addgroup --system --gid 1001 bun 2>/dev/null || true \
+    && adduser --system --uid 1001 bun 2>/dev/null || adduser --system --uid 1001 --ingroup bun bun || true
 
 # Copy staging build
 COPY --from=staging-build --chown=bun:bun /app/build ./build
